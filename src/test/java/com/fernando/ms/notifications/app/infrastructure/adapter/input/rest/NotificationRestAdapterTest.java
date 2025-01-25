@@ -4,6 +4,7 @@ import com.fernando.ms.notifications.app.TestUtils.TestUtilsNotification;
 import com.fernando.ms.notifications.app.application.ports.input.NotificationInputPort;
 import com.fernando.ms.notifications.app.domain.models.Notification;
 import com.fernando.ms.notifications.app.infrastructure.adapter.input.rest.mapper.NotificationRestMapper;
+import com.fernando.ms.notifications.app.infrastructure.adapter.input.rest.models.request.CreateNotificationRequest;
 import com.fernando.ms.notifications.app.infrastructure.adapter.input.rest.models.response.NotificationResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -15,7 +16,9 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
 
@@ -43,7 +46,7 @@ public class NotificationRestAdapterTest {
         NotificationResponse notificationResponse= TestUtilsNotification.buildNotificationResponseMock();
         when(notificationInputPort.findAllByUser(anyLong(), anyLong(), anyLong()))
                 .thenReturn(Flux.just(new Notification()));
-        when(notificationRestMapper.toNotificationsResponse(Mockito.any(Flux.class)))
+        when(notificationRestMapper.toNotificationsResponse(any(Flux.class)))
                 .thenReturn(Flux.just(notificationResponse));
 
         webTestClient.get()
@@ -61,6 +64,31 @@ public class NotificationRestAdapterTest {
                     assert response.size() == 1;
                     assert response.get(0).getId().equals(notificationResponse.getId());
                     // Add more assertions as needed
+                });
+    }
+
+    @Test
+    @DisplayName("When Notification Information Is Correct Expect Notification To Be Save Correctly")
+    void When_NotificationInformationIsCorrect_Expect_NotificationToBeSaveCorrectly() {
+        CreateNotificationRequest rq=TestUtilsNotification.buildCreateNotificationRequestMock();
+        Notification notification=TestUtilsNotification.buildNotificationMock();
+        NotificationResponse notificationResponse=TestUtilsNotification.buildNotificationResponseMock();
+        when(notificationRestMapper.toNotification(any(CreateNotificationRequest.class)))
+                .thenReturn(notification);
+        when(notificationInputPort.save(any(Notification.class)))
+                .thenReturn(Mono.just(notification));
+        when(notificationRestMapper.toNotificationResponse(any(Notification.class)))
+                .thenReturn(notificationResponse);
+
+        webTestClient.post()
+                .uri("/notifications")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(rq)
+                .exchange()
+                .expectStatus().isCreated()
+                .expectBody(NotificationResponse.class)
+                .value(response -> {
+                    assert response.getId().equals(notificationResponse.getId());
                 });
     }
 }

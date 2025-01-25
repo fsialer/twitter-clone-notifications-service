@@ -3,9 +3,11 @@ package com.fernando.ms.notifications.app.TestUtils;
 import com.fernando.ms.notifications.app.domain.models.Notification;
 import com.fernando.ms.notifications.app.domain.models.Target;
 import com.fernando.ms.notifications.app.domain.models.User;
+import com.fernando.ms.notifications.app.infrastructure.adapter.input.rest.models.request.CreateNotificationRequest;
 import com.fernando.ms.notifications.app.infrastructure.adapter.input.rest.models.response.NotificationResponse;
 import com.fernando.ms.notifications.app.infrastructure.adapter.input.rest.models.response.TargetResponse;
 import com.fernando.ms.notifications.app.infrastructure.adapter.input.rest.models.response.UserResponse;
+import com.fernando.ms.notifications.app.infrastructure.adapter.output.persistence.models.NotificationDocument;
 
 import java.time.LocalDateTime;
 
@@ -43,6 +45,23 @@ public class TestUtilsNotification {
                                 .content("content")
                                 .build()
                 )
+                .build();
+    }
+
+    public static NotificationDocument buildNotificationDocumentMock(){
+        return NotificationDocument.builder()
+                .id("dsd54854515d4s5d4")
+                .targetType("POST")
+                .targetId("ds63545154151515")
+                .userId(1L)
+                .build();
+    }
+
+    public static CreateNotificationRequest buildCreateNotificationRequestMock(){
+        return CreateNotificationRequest.builder()
+                .targetId("ds63545154151515")
+                .targetType("POST")
+                .userId(1L)
                 .build();
     }
 }

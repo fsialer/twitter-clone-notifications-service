@@ -76,4 +76,18 @@ public class NotificationServiceTest {
                 .expectNext(notification)
                 .verifyComplete();
     }
+
+    @Test
+    @DisplayName("When Notification Information Is Correct Expect Notification Information To Be Save")
+    void When_NotificationInformationIsCorrect_Expect_NotificationInformationToBeSave() {
+        Notification notification= TestUtilsNotification.buildNotificationMock();
+        when(notificationPersistencePort.save(any(Notification.class)))
+                .thenReturn(Mono.just(notification));
+
+        Mono<Notification> result = notificationService.save(notification);
+
+        StepVerifier.create(result)
+                .expectNext(notification)
+                .verifyComplete();
+    }
 }

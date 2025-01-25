@@ -11,6 +11,7 @@ import com.fernando.ms.notifications.app.domain.models.Notification;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.util.List;
 
@@ -39,5 +40,10 @@ public class NotificationService implements NotificationInputPort {
                                         return notification;
                                     }));
                 });
+    }
+
+    @Override
+    public Mono<Notification> save(Notification notification) {
+        return notificationPersistencePort.save(notification);
     }
 }

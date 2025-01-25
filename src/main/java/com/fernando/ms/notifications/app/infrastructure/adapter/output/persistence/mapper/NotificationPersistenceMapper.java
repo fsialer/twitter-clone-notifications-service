@@ -7,6 +7,9 @@ import com.fernando.ms.notifications.app.infrastructure.adapter.output.persisten
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+
+import java.time.LocalDateTime;
 
 @Mapper(componentModel = "spring")
 public interface NotificationPersistenceMapper {
@@ -28,5 +31,20 @@ public interface NotificationPersistenceMapper {
                 .id(notifications.getTargetId())
                 .type(notifications.getTargetType())
                 .build();
+    }
+
+    default NotificationDocument toNotificationDocument(Notification notification){
+        return NotificationDocument
+                .builder()
+                .dateNotified(LocalDateTime.now())
+                .read(notification.getRead())
+                .userId(notification.getUser().getId())
+                .targetId(notification.getTarget().getId())
+                .targetType(notification.getTarget().getType())
+                .build();
+    }
+
+    default Mono<Notification> toNotification(Mono<NotificationDocument> notification){
+        return notification.map(this::toNotification);
     }
 }

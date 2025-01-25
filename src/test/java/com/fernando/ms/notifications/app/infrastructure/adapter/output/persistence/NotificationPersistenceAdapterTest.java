@@ -15,6 +15,7 @@ import org.mockito.Mock;
 import org.mockito.internal.matchers.Any;
 import org.mockito.junit.jupiter.MockitoExtension;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -43,6 +44,25 @@ public class NotificationPersistenceAdapterTest {
                 .thenReturn(Flux.just(notification)); // Mock the mapper response
 
         Flux<Notification> result = notificationPersistenceAdapter.findAllByUser(1L, 0L, 10L);
+
+        StepVerifier.create(result)
+                .expectNext(notification)
+                .verifyComplete();
+    }
+
+    @Test
+    @DisplayName("When NotificationInformation Is Correct Expect Notification Information Save Correctly")
+    void When_NotificationInformationIsCorrect_Expect_NotificationInformationSaveCorrectly() {
+        NotificationDocument notificationDocument=TestUtilsNotification.buildNotificationDocumentMock();
+        Notification notification= TestUtilsNotification.buildNotificationMock();
+        when(notificationPersistenceMapper.toNotificationDocument(any(Notification.class)))
+                .thenReturn(notificationDocument);
+        when(notificationReactiveMongoRepository.save(any(NotificationDocument.class)))
+                .thenReturn(Mono.just(notificationDocument));
+        when(notificationPersistenceMapper.toNotification(any(Mono.class)))
+                .thenReturn(Mono.just(notification));
+
+        Mono<Notification> result = notificationPersistenceAdapter.save(notification);
 
         StepVerifier.create(result)
                 .expectNext(notification)
