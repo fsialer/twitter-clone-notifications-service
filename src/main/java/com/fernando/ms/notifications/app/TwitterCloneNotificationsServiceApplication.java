@@ -1,4 +1,4 @@
-package com.fernando.ms.notifications.app.twitter_clone_notifications_service;
+package com.fernando.ms.notifications.app;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

@@ -1,0 +1,16 @@
+server:
+  port: 8085
+spring:
+  application:
+    name: twitter-clone-notifications-service
+  jackson:
+    default-property-inclusion: NON_NULL
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017/tc_notification_db
+users-service:
+  url: ${USER_URL:http://localhost:8080/users}
+posts-service:
+  url: ${POST_URL:http://localhost:8081/posts}
+comments-service:server:
+  url: ${COMMENT_URL:http://localhost:8082/comment}
