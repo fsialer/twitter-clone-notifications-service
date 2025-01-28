@@ -2,6 +2,7 @@ package com.fernando.ms.notifications.app.infrastructure.adapter.output.restclie
 
 import com.fernando.ms.notifications.app.application.ports.output.ExternalPostOutputPort;
 import com.fernando.ms.notifications.app.domain.models.Target;
+import com.fernando.ms.notifications.app.infrastructure.adapter.output.restclient.client.PostWebClient;
 import com.fernando.ms.notifications.app.infrastructure.adapter.output.restclient.mapper.PostRestClientMapper;
 import com.fernando.ms.notifications.app.infrastructure.adapter.output.restclient.mapper.UserRestClientMapper;
 import com.fernando.ms.notifications.app.infrastructure.adapter.output.restclient.models.response.PostResponse;
@@ -14,15 +15,11 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 @Component
 public class PostRestClientAdapter implements ExternalPostOutputPort {
-    private final WebClient webClientPost;
     private final PostRestClientMapper postRestClientMapper;
+    private final PostWebClient postWebClient;
     @Override
     public Mono<Target> findById(String id) {
-        return webClientPost
-                .get()
-                .uri("/posts/{id}",id)
-                .retrieve()
-                .bodyToMono(PostResponse.class)
+        return postWebClient.findById(id)
                 .flatMap(post->{
                     return Mono.just(postRestClientMapper.toTarget(post));
                 });
