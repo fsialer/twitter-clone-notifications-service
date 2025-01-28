@@ -8,6 +8,7 @@ import com.fernando.ms.notifications.app.application.ports.output.ExternalPostOu
 import com.fernando.ms.notifications.app.application.ports.output.ExternalUserOutputPort;
 import com.fernando.ms.notifications.app.application.ports.output.NotificationPersistencePort;
 import com.fernando.ms.notifications.app.application.services.strategy.notification.ITargetStrategy;
+import com.fernando.ms.notifications.app.domain.exception.NotificationNotFoundException;
 import com.fernando.ms.notifications.app.domain.models.Notification;
 import com.fernando.ms.notifications.app.domain.models.Target;
 import com.fernando.ms.notifications.app.domain.models.User;
@@ -89,5 +90,34 @@ public class NotificationServiceTest {
         StepVerifier.create(result)
                 .expectNext(notification)
                 .verifyComplete();
+    }
+
+    @Test
+    @DisplayName("When Notification Exists Expect Notification To Be Marked As Read")
+    void whenNotificationExists_expectNotificationToBeMarkedAsRead() {
+        Notification notification= TestUtilsNotification.buildNotificationMock();
+        when(notificationPersistencePort.findById(anyString()))
+                .thenReturn(Mono.just(notification));
+        when(notificationPersistencePort.save(any(Notification.class)))
+                .thenReturn(Mono.just(notification));
+
+        Mono<Notification> result = notificationService.read("notificationId", true);
+
+        StepVerifier.create(result)
+                .expectNextMatches(savedNotification -> savedNotification.getRead().equals(true))
+                .verifyComplete();
+    }
+
+    @Test
+    @DisplayName("When Notification Does Not Exist Expect NotificationNotFoundException")
+    void whenNotificationDoesNotExist_expectNotificationNotFoundException() {
+        when(notificationPersistencePort.findById(anyString()))
+                .thenReturn(Mono.empty());
+
+        Mono<Notification> result = notificationService.read("notificationId", true);
+
+        StepVerifier.create(result)
+                .expectError(NotificationNotFoundException.class)
+                .verify();
     }
 }

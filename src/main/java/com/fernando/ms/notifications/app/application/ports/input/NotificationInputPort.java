@@ -9,4 +9,5 @@ import java.util.List;
 public interface NotificationInputPort {
     Flux<Notification> findAllByUser(Long id,Long page,Long size);
     Mono<Notification> save(Notification notification);
+    Mono<Notification> read(String id,Boolean value);
 }

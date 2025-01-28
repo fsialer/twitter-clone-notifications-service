@@ -6,6 +6,7 @@ import com.fernando.ms.notifications.app.application.ports.output.ExternalPostOu
 import com.fernando.ms.notifications.app.application.ports.output.ExternalUserOutputPort;
 import com.fernando.ms.notifications.app.application.ports.output.NotificationPersistencePort;
 import com.fernando.ms.notifications.app.application.services.strategy.notification.ITargetStrategy;
+import com.fernando.ms.notifications.app.domain.exception.NotificationNotFoundException;
 import com.fernando.ms.notifications.app.domain.exception.TargetTypeNotFoundException;
 import com.fernando.ms.notifications.app.domain.models.Notification;
 import lombok.RequiredArgsConstructor;
@@ -44,6 +45,17 @@ public class NotificationService implements NotificationInputPort {
 
     @Override
     public Mono<Notification> save(Notification notification) {
+        notification.setRead(false);
         return notificationPersistencePort.save(notification);
+    }
+
+    @Override
+    public Mono<Notification> read(String id, Boolean value) {
+        return notificationPersistencePort.findById(id)
+                .switchIfEmpty(Mono.error(NotificationNotFoundException::new))
+                .flatMap(notification -> {
+                    notification.setRead(value);
+                    return notificationPersistencePort.save(notification);
+                });
     }
 }

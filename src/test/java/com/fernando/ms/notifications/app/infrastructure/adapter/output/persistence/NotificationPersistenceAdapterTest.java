@@ -18,8 +18,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -68,4 +67,41 @@ public class NotificationPersistenceAdapterTest {
                 .expectNext(notification)
                 .verifyComplete();
     }
+
+    @Test
+    @DisplayName("When Notification Identifier Exists Expect Notification Information Correct")
+    void When_NotificationIdentifierExists_Expect_NotificationInformationCorrect() {
+        NotificationDocument notificationDocument=TestUtilsNotification.buildNotificationDocumentMock();
+        Notification notification=TestUtilsNotification.buildNotificationMock();
+        when(notificationReactiveMongoRepository.findById(anyString()))
+                .thenReturn(Mono.just(notificationDocument));
+        when(notificationPersistenceMapper.toNotification(any(NotificationDocument.class)))
+                .thenReturn(notification);
+
+        Mono<Notification> result = notificationPersistenceAdapter.findById("notificationId");
+
+        StepVerifier.create(result)
+                .expectNext(notification)
+                .verifyComplete();
+    }
+
+    @Test
+    @DisplayName("When Notification Information Is Correct Expect Notification Information Saved Correctly")
+    void When_NotificationInformationIsCorrect_Expect_NotificationInformationSavedCorrectly() {
+        NotificationDocument notificationDocument=TestUtilsNotification.buildNotificationDocumentMock();
+        Notification notification=TestUtilsNotification.buildNotificationMock();
+        when(notificationPersistenceMapper.toNotificationDocument(any(Notification.class)))
+                .thenReturn(notificationDocument);
+        when(notificationReactiveMongoRepository.save(any(NotificationDocument.class)))
+                .thenReturn(Mono.just(notificationDocument));
+        when(notificationPersistenceMapper.toNotification(any(NotificationDocument.class)))
+                .thenReturn(notification);
+
+        Mono<Notification> result = notificationPersistenceAdapter.update(notification);
+
+        StepVerifier.create(result)
+                .expectNext(notification)
+                .verifyComplete();
+    }
+
 }

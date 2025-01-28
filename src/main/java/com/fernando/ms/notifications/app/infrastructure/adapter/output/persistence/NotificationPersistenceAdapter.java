@@ -27,4 +27,14 @@ public class NotificationPersistenceAdapter implements NotificationPersistencePo
         NotificationDocument notificationDocument=notificationPersistenceMapper.toNotificationDocument(notification);
         return notificationPersistenceMapper.toNotification(notificationReactiveMongoRepository.save(notificationDocument));
     }
+
+    @Override
+    public Mono<Notification> findById(String id) {
+        return notificationReactiveMongoRepository.findById(id).map(notificationPersistenceMapper::toNotification);
+    }
+
+    @Override
+    public Mono<Notification> update(Notification notification) {
+        return notificationReactiveMongoRepository.save(notificationPersistenceMapper.toNotificationDocument(notification)).map(notificationPersistenceMapper::toNotification);
+    }
 }

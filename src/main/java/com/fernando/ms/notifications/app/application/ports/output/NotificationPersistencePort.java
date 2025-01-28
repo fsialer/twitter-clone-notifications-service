@@ -9,4 +9,6 @@ import java.util.List;
 public interface NotificationPersistencePort {
     Flux<Notification> findAllByUser(Long id,Long page,Long size);
     Mono<Notification> save(Notification notification);
+    Mono<Notification> findById(String id);
+    Mono<Notification> update(Notification notification);
 }

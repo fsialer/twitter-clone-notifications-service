@@ -1,10 +1,12 @@
 package com.fernando.ms.notifications.app.infrastructure.adapter.input.rest;
 
+import com.fernando.ms.notifications.app.domain.exception.NotificationNotFoundException;
 import com.fernando.ms.notifications.app.domain.exception.TargetTypeNotFoundException;
 import com.fernando.ms.notifications.app.infrastructure.adapter.input.rest.models.response.ErrorResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 import reactor.core.publisher.Mono;
 
 import java.time.LocalDate;
@@ -14,6 +16,7 @@ import static com.fernando.ms.notifications.app.infrastructure.adapter.input.res
 import static com.fernando.ms.notifications.app.infrastructure.adapter.input.rest.models.enums.ErrorType.SYSTEM;
 import static com.fernando.ms.notifications.app.infrastructure.utils.ErrorCatalog.*;
 
+@RestControllerAdvice
 public class GlobalControllerAdvice {
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler(TargetTypeNotFoundException.class)
@@ -26,6 +29,19 @@ public class GlobalControllerAdvice {
                 .timestamp(LocalDate.now().toString())
                 .build());
     }
+
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ExceptionHandler(NotificationNotFoundException.class)
+    public Mono<ErrorResponse> handleNotificationNotFoundException() {
+        return Mono.just(ErrorResponse.builder()
+                .code(NOTIFICATION_NOT_FOUND.getCode())
+                .type(FUNCTIONAL)
+                .message(NOTIFICATION_NOT_FOUND.getMessage())
+                .timestamp(LocalDate.now().toString())
+                .build());
+    }
+
+
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(Exception.class)
     public Mono<ErrorResponse> handleException(Exception e) {

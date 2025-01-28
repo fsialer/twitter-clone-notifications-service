@@ -18,8 +18,7 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 
 @WebFluxTest(controllers = {NotificationRestAdapter.class})
@@ -89,6 +88,29 @@ public class NotificationRestAdapterTest {
                 .expectBody(NotificationResponse.class)
                 .value(response -> {
                     assert response.getId().equals(notificationResponse.getId());
+                });
+    }
+
+
+    @Test
+    @DisplayName("When Notification Identifier Is Correct Expect Notification Change Marked")
+    void When_NotificationIdentifierIsCorrect_Expect_NotificationChangeMarked() {
+        Notification notification=TestUtilsNotification.buildNotificationMock();
+        NotificationResponse notificationResponse=TestUtilsNotification.buildNotificationResponseMock();
+        when(notificationInputPort.read(anyString(), anyBoolean()))
+                .thenReturn(Mono.just(notification));
+        when(notificationRestMapper.toNotificationResponse(any(Notification.class)))
+                .thenReturn(notificationResponse);
+
+        webTestClient.put()
+                .uri("/notifications/{notificationId}/read/{value}", "notificationId", true)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(NotificationResponse.class)
+                .value(response -> {
+                    assert response.getId().equals(notificationResponse.getId());
+                    // Add more assertions as needed
                 });
     }
 }

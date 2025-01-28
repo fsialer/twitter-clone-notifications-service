@@ -35,4 +35,12 @@ public class NotificationRestAdapter {
                             return Mono.just(ResponseEntity.created(URI.create(location)).body(notificationRestMapper.toNotificationResponse(notification)));
                 });
     }
+
+    @PutMapping("/{notificationId}/read/{value}")
+    public Mono<ResponseEntity<NotificationResponse>> read(@PathVariable("notificationId") String notificationId,@PathVariable("value") Boolean value){
+        return notificationInputPort.read(notificationId,value)
+                .flatMap(notification -> {
+                    return Mono.just(ResponseEntity.ok().body(notificationRestMapper.toNotificationResponse(notification)));
+                });
+    }
 }
