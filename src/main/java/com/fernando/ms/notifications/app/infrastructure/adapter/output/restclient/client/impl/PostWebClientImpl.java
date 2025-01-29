@@ -15,7 +15,7 @@ public class PostWebClientImpl implements PostWebClient {
     public Mono<PostResponse> findById(String id) {
         return webClientPost
                 .get()
-                .uri("/posts/{id}",id)
+                .uri("/{id}",id)
                 .retrieve()
                 .bodyToMono(PostResponse.class);
     }

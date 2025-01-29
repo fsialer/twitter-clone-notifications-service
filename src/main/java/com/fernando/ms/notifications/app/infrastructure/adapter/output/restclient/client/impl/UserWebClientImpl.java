@@ -15,7 +15,7 @@ public class UserWebClientImpl implements UserWebClient {
     public Mono<UserResponse> findById(Long id) {
         return webClientUser
                 .get()
-                .uri("/users/{id}",id)
+                .uri("/{id}",id)
                 .retrieve()
                 .bodyToMono(UserResponse.class);
 

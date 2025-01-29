@@ -12,13 +12,17 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.internal.matchers.Any;
 import org.mockito.junit.jupiter.MockitoExtension;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
+import java.util.List;
+
 import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -102,6 +106,30 @@ public class NotificationPersistenceAdapterTest {
         StepVerifier.create(result)
                 .expectNext(notification)
                 .verifyComplete();
+    }
+
+
+    @Test
+    @DisplayName("When List Notifications Are Corrects Expect Saved Successfully")
+    void When_ListNotificationsAreCorrects_ExpectSavedSuccessfully() {
+        NotificationDocument notificationDocument = TestUtilsNotification.buildNotificationDocumentMock();
+        Notification notification = TestUtilsNotification.buildNotificationMock();
+
+        when(notificationPersistenceMapper.toNotificationsDocument(any(Iterable.class)))
+                .thenReturn(Flux.just(notificationDocument));
+        when(notificationReactiveMongoRepository.saveAll(any(Flux.class)))
+                .thenReturn(Flux.fromIterable(List.of(notificationDocument)));
+        when(notificationPersistenceMapper.toNotifications(any(Flux.class)))
+                .thenReturn(Flux.fromIterable(List.of(notification)));
+
+        Flux<Notification> result = notificationPersistenceAdapter.save(List.of(notification));
+
+        StepVerifier.create(result)
+                .expectNext(notification)
+                .verifyComplete();
+        Mockito.verify(notificationPersistenceMapper,times(1)).toNotificationsDocument(any(Iterable.class));
+        Mockito.verify(notificationReactiveMongoRepository,times(1)).saveAll(any(Flux.class));
+        Mockito.verify(notificationPersistenceMapper,times(1)).toNotifications(any(Flux.class));
     }
 
 }

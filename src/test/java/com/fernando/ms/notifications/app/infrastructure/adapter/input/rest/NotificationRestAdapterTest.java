@@ -18,7 +18,12 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+
 import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.when;
 
 @WebFluxTest(controllers = {NotificationRestAdapter.class})
@@ -112,5 +117,26 @@ public class NotificationRestAdapterTest {
                     assert response.getId().equals(notificationResponse.getId());
                     // Add more assertions as needed
                 });
+    }
+
+
+    @Test
+    @DisplayName("When List Notifications Are Corrects Expect Saved Successfully")
+    void When_ListNotificationsAreCorrects_Expect_SavedSuccessfully() {
+        Notification notification=TestUtilsNotification.buildNotificationMock();
+        CreateNotificationRequest createNotificationRequest=TestUtilsNotification.buildCreateNotificationRequestMock();
+        when(notificationRestMapper.toUsers(any(List.class)))
+                .thenReturn(Collections.singletonList(notification));
+        when(notificationInputPort.save(any(List.class)))
+                .thenReturn(Mono.empty());
+
+        webTestClient.post()
+                .uri("/notifications/all")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(Collections.singletonList(createNotificationRequest))
+                .exchange()
+                .expectStatus().isNoContent();
+        Mockito.verify(notificationRestMapper,times(1)).toUsers(any(List.class));
+        Mockito.verify(notificationInputPort,times(1)).save(any(List.class));
     }
 }

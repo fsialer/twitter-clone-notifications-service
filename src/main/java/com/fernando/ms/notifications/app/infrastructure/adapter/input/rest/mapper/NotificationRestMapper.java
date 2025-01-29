@@ -9,6 +9,10 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import reactor.core.publisher.Flux;
 
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
+
 @Mapper(componentModel = "spring")
 public interface NotificationRestMapper {
     default Flux<NotificationResponse> toNotificationsResponse(Flux<Notification> notifications){
@@ -27,5 +31,11 @@ public interface NotificationRestMapper {
 
     default Target toTarget(CreateNotificationRequest rq){
         return Target.builder().id(rq.getTargetId()).type(rq.getTargetType()).build();
+    }
+
+    default List<Notification> toUsers(Iterable<CreateNotificationRequest> rqLst) {
+        return StreamSupport.stream(rqLst.spliterator(), false)
+                .map(this::toNotification)
+                .collect(Collectors.toList());
     }
 }

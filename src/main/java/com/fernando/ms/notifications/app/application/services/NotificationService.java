@@ -14,7 +14,9 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.Iterator;
 import java.util.List;
+import java.util.stream.StreamSupport;
 
 @Service
 @RequiredArgsConstructor
@@ -57,5 +59,12 @@ public class NotificationService implements NotificationInputPort {
                     notification.setRead(value);
                     return notificationPersistencePort.save(notification);
                 });
+    }
+
+    @Override
+    public Mono<Void> save(Iterable<Notification> notifications) {
+        return notificationPersistencePort.save( StreamSupport.stream(notifications.spliterator(), false)
+                        .peek(notification-> notification.setRead(false))
+                .toList()).then();
     }
 }

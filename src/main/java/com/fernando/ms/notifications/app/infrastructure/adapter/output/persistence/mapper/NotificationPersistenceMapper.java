@@ -10,6 +10,9 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
+import java.util.Iterator;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 @Mapper(componentModel = "spring")
 public interface NotificationPersistenceMapper {
@@ -46,5 +49,16 @@ public interface NotificationPersistenceMapper {
 
     default Mono<Notification> toNotification(Mono<NotificationDocument> notification){
         return notification.map(this::toNotification);
+    }
+
+    default Flux<NotificationDocument> toNotificationsDocument(Iterable<Notification> notifications){
+        return Flux.fromIterable(
+                StreamSupport.stream(notifications.spliterator(), false)
+                        .map(notification -> {
+                            notification.setRead(false);
+                            return toNotificationDocument(notification);
+                        })
+                        .collect(Collectors.toList())
+        );
     }
 }

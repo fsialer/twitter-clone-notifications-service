@@ -17,7 +17,7 @@ public class CommentWebClientImpl implements CommentWebClient {
     public Mono<CommentResponse> findById(String id) {
         return webClientComment
                 .get()
-                .uri("/comments/{id}",id)
+                .uri("/{id}",id)
                 .retrieve()
                 .bodyToMono(CommentResponse .class);
     }

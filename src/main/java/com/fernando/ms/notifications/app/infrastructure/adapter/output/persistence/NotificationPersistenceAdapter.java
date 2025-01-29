@@ -10,6 +10,8 @@ import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.Iterator;
+
 @RequiredArgsConstructor
 @Component
 public class NotificationPersistenceAdapter implements NotificationPersistencePort {
@@ -36,5 +38,10 @@ public class NotificationPersistenceAdapter implements NotificationPersistencePo
     @Override
     public Mono<Notification> update(Notification notification) {
         return notificationReactiveMongoRepository.save(notificationPersistenceMapper.toNotificationDocument(notification)).map(notificationPersistenceMapper::toNotification);
+    }
+
+    @Override
+    public  Flux<Notification> save(Iterable<Notification> notifications) {
+        return notificationPersistenceMapper.toNotifications(notificationReactiveMongoRepository.saveAll(notificationPersistenceMapper.toNotificationsDocument(notifications)));
     }
 }

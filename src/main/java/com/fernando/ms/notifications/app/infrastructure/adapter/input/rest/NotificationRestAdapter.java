@@ -6,12 +6,14 @@ import com.fernando.ms.notifications.app.infrastructure.adapter.input.rest.model
 import com.fernando.ms.notifications.app.infrastructure.adapter.input.rest.models.response.NotificationResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.net.URI;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -42,5 +44,11 @@ public class NotificationRestAdapter {
                 .flatMap(notification -> {
                     return Mono.just(ResponseEntity.ok().body(notificationRestMapper.toNotificationResponse(notification)));
                 });
+    }
+
+    @PostMapping("/all")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public Mono<Void> saveAll(@Valid @RequestBody List<CreateNotificationRequest> rq){
+        return notificationInputPort.save(notificationRestMapper.toUsers(rq));
     }
 }

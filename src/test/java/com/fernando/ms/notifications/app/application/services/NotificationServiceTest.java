@@ -18,6 +18,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -26,6 +27,7 @@ import reactor.test.StepVerifier;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -119,5 +121,19 @@ public class NotificationServiceTest {
         StepVerifier.create(result)
                 .expectError(NotificationNotFoundException.class)
                 .verify();
+    }
+
+    @Test
+    @DisplayName("When List Notifications Are Corrects Expect Save Correctly")
+    void When_ListNotificationsAreCorrects_Expect_SaveCorrectly() {
+        Notification notification= TestUtilsNotification.buildNotificationMock();
+        when(notificationPersistencePort.save(any(Iterable.class)))
+                .thenReturn(Flux.just(notification));
+        Mono<Void> result = notificationService.save(List.of(notification));
+
+        StepVerifier.create(result)
+                .verifyComplete();
+
+        Mockito.verify(notificationPersistencePort,times(1)).save(any(Iterable.class));
     }
 }

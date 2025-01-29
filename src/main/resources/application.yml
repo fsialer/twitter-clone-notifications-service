@@ -13,4 +13,4 @@ users-service:
 posts-service:
   url: ${POST_URL:http://localhost:8081/posts}
 comments-service:
-  url: ${COMMENT_URL:http://localhost:8082/comment}
+  url: ${COMMENT_URL:http://localhost:8082/comments}
