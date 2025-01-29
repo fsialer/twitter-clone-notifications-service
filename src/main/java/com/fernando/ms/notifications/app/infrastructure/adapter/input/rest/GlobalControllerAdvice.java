@@ -3,10 +3,13 @@ package com.fernando.ms.notifications.app.infrastructure.adapter.input.rest;
 import com.fernando.ms.notifications.app.domain.exception.NotificationNotFoundException;
 import com.fernando.ms.notifications.app.domain.exception.TargetTypeNotFoundException;
 import com.fernando.ms.notifications.app.infrastructure.adapter.input.rest.models.response.ErrorResponse;
+import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.bind.support.WebExchangeBindException;
 import reactor.core.publisher.Mono;
 
 import java.time.LocalDate;
@@ -37,6 +40,22 @@ public class GlobalControllerAdvice {
                 .code(NOTIFICATION_NOT_FOUND.getCode())
                 .type(FUNCTIONAL)
                 .message(NOTIFICATION_NOT_FOUND.getMessage())
+                .timestamp(LocalDate.now().toString())
+                .build());
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(WebExchangeBindException.class)
+    public Mono<ErrorResponse> handleWebExchangeBindException(
+            WebExchangeBindException e) {
+        BindingResult bindingResult = e.getBindingResult();
+        return Mono.just(ErrorResponse.builder()
+                .code(NOTIFICATION_BAB_REQUEST.getCode())
+                .type(FUNCTIONAL)
+                .message(NOTIFICATION_BAB_REQUEST.getMessage())
+                .details(bindingResult.getFieldErrors().stream()
+                        .map(DefaultMessageSourceResolvable::getDefaultMessage)
+                        .toList())
                 .timestamp(LocalDate.now().toString())
                 .build());
     }

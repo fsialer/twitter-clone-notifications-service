@@ -9,6 +9,7 @@ import com.fernando.ms.notifications.app.domain.exception.NotificationNotFoundEx
 import com.fernando.ms.notifications.app.domain.exception.TargetTypeNotFoundException;
 import com.fernando.ms.notifications.app.domain.models.Notification;
 import com.fernando.ms.notifications.app.infrastructure.adapter.input.rest.mapper.NotificationRestMapper;
+import com.fernando.ms.notifications.app.infrastructure.adapter.input.rest.models.request.CreateNotificationRequest;
 import com.fernando.ms.notifications.app.infrastructure.adapter.input.rest.models.response.ErrorResponse;
 import com.fernando.ms.notifications.app.infrastructure.adapter.input.rest.models.response.NotificationResponse;
 import org.junit.jupiter.api.DisplayName;
@@ -106,6 +107,28 @@ public class GlobalControllerAdviceTest {
                     assert response.getCode().equals(NOTIFICATION_NOT_FOUND.getCode());
                     assert response.getType().equals(FUNCTIONAL);
                     assert response.getMessage().equals(NOTIFICATION_NOT_FOUND.getMessage());
+                });
+    }
+
+    @Test
+    @DisplayName("Expect WebExchangeBindException When Notification Information Is Invalid")
+    void Expect_WebExchangeBindException_When_NotificationInformationIsInvalid() throws JsonProcessingException {
+        CreateNotificationRequest createNotificationRequest= CreateNotificationRequest.builder()
+                .userId(1L)
+                .targetId("")
+                .targetType("POST")
+                .build();
+
+        webTestClient.post()
+                .uri("/notifications")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(objectMapper.writeValueAsString(createNotificationRequest))
+                .exchange()
+                .expectStatus().isBadRequest()
+                .expectBody(ErrorResponse.class)
+                .value(response -> {
+                    assert response.getCode().equals(NOTIFICATION_BAB_REQUEST.getCode());
+                    assert response.getMessage().equals(NOTIFICATION_BAB_REQUEST.getMessage());
                 });
     }
 
