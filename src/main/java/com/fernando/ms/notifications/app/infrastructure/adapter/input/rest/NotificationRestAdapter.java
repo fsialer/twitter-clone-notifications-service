@@ -17,7 +17,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/notifications")
+@RequestMapping("/v1/notifications")
 public class NotificationRestAdapter {
     private final NotificationInputPort notificationInputPort;
     private final NotificationRestMapper notificationRestMapper;

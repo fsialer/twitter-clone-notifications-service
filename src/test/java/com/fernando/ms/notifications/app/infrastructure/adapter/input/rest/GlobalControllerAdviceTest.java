@@ -57,7 +57,7 @@ public class GlobalControllerAdviceTest {
                 .thenReturn(Flux.error(new TargetTypeNotFoundException("Target type not found")));
 
         webTestClient.get()
-                .uri("/notifications/user?userId=1&size=10&page=0")
+                .uri("/v1/notifications/user?userId=1&size=10&page=0")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isNotFound()
@@ -76,7 +76,7 @@ public class GlobalControllerAdviceTest {
                 .thenThrow(new RuntimeException("Internal server error"));
 
         webTestClient.get()
-                .uri("/notifications/user?userId=1&size=10&page=0")
+                .uri("/v1/notifications/user?userId=1&size=10&page=0")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().is5xxServerError()
@@ -98,7 +98,7 @@ public class GlobalControllerAdviceTest {
                 .thenReturn(Mono.error(new NotificationNotFoundException()));
 
         webTestClient.put()
-                .uri("/notifications/{notificationId}/read/{value}", "nonExistentId",true)
+                .uri("/v1/notifications/{notificationId}/read/{value}", "nonExistentId",true)
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isNotFound()
@@ -120,7 +120,7 @@ public class GlobalControllerAdviceTest {
                 .build();
 
         webTestClient.post()
-                .uri("/notifications")
+                .uri("/v1/notifications")
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(objectMapper.writeValueAsString(createNotificationRequest))
                 .exchange()

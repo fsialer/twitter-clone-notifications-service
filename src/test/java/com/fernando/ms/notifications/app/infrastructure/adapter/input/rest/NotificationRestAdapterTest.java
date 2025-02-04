@@ -55,7 +55,7 @@ public class NotificationRestAdapterTest {
 
         webTestClient.get()
                 .uri(uriBuilder -> uriBuilder
-                        .path("/notifications/user")
+                        .path("/v1/notifications/user")
                         .queryParam("userId", 1L)
                         .queryParam("size", 10L)
                         .queryParam("page", 0L)
@@ -85,7 +85,7 @@ public class NotificationRestAdapterTest {
                 .thenReturn(notificationResponse);
 
         webTestClient.post()
-                .uri("/notifications")
+                .uri("/v1/notifications")
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(rq)
                 .exchange()
@@ -108,7 +108,7 @@ public class NotificationRestAdapterTest {
                 .thenReturn(notificationResponse);
 
         webTestClient.put()
-                .uri("/notifications/{notificationId}/read/{value}", "notificationId", true)
+                .uri("/v1/notifications/{notificationId}/read/{value}", "notificationId", true)
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isOk()
@@ -131,7 +131,7 @@ public class NotificationRestAdapterTest {
                 .thenReturn(Mono.empty());
 
         webTestClient.post()
-                .uri("/notifications/all")
+                .uri("/v1/notifications/all")
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(Collections.singletonList(createNotificationRequest))
                 .exchange()
