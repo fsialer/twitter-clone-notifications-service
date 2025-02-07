@@ -7,7 +7,9 @@ spring:
     default-property-inclusion: NON_NULL
   data:
     mongodb:
-      uri: mongodb://localhost:27017/tc_notification_db
+      uri: ${DB_HOST://localhost:27017/tc_notification_db}
+      username: ${DB_USERNAME:root}
+      password: ${DB_PASSWORD:1234}
 users-service:
   url: ${USER_URL:http://localhost:8080/users}
 posts-service:
