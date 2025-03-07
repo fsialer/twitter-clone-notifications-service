@@ -1,8 +1,6 @@
 package com.fernando.ms.notifications.app.application.services;
 
 import com.fernando.ms.notifications.app.application.ports.input.NotificationInputPort;
-import com.fernando.ms.notifications.app.application.ports.output.ExternalCommentOutputPort;
-import com.fernando.ms.notifications.app.application.ports.output.ExternalPostOutputPort;
 import com.fernando.ms.notifications.app.application.ports.output.ExternalUserOutputPort;
 import com.fernando.ms.notifications.app.application.ports.output.NotificationPersistencePort;
 import com.fernando.ms.notifications.app.application.services.strategy.notification.ITargetStrategy;
@@ -14,7 +12,6 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.stream.StreamSupport;
 
@@ -23,15 +20,13 @@ import java.util.stream.StreamSupport;
 public class NotificationService implements NotificationInputPort {
     private final NotificationPersistencePort notificationPersistencePort;
     private final ExternalUserOutputPort externalUserOutputPort;
-    private final List<ITargetStrategy> ITargetStrategyList;
-
-
+    private final List<ITargetStrategy> iTargetStrategyList;
 
     @Override
     public Flux<Notification> findAllByUser(Long id,Long page,Long size) {
         return notificationPersistencePort.findAllByUser(id, page, size)
                 .flatMap(notification -> {
-                    ITargetStrategy targetStrategy = ITargetStrategyList.stream()
+                    ITargetStrategy targetStrategy = iTargetStrategyList.stream()
                             .filter(strategy -> strategy.isApplicable(notification.getTarget().getType()))
                             .findFirst()
                             .orElseThrow(() -> new TargetTypeNotFoundException("Target type ".concat(notification.getTarget().getType()).concat(" no exists.")));
